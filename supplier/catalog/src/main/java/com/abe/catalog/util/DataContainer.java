@@ -1,4 +1,4 @@
-package com.abe.catalog;
+package com.abe.catalog.util;
 
 import java.util.List;
 

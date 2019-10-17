@@ -11,8 +11,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
-import com.abe.catalog.DataContainer;
 import com.abe.catalog.model.Product;
+import com.abe.catalog.util.DataContainer;
 
 @Service
 public class CatalogService {
@@ -44,6 +44,14 @@ public class CatalogService {
 			filterById(product, parameter.getId())
 			&& filterByName(product, parameter.getName())
 			&& filterByAvailable(product, parameter.getAvailable())
+		).collect(Collectors.toList());
+		DataContainer<Product> result = new DataContainer<Product>(limit, offset, filteredList.size(), filteredList.subList(offset, (offset+limit <= filteredList.size() ? offset+limit : filteredList.size())));
+		return result;
+	}
+	
+	public DataContainer<Product> find(List<Long> ids, int limit, int offset) {
+		List<Product> filteredList = products.stream().filter(product ->
+			ids.contains(product.getId())
 		).collect(Collectors.toList());
 		DataContainer<Product> result = new DataContainer<Product>(limit, offset, filteredList.size(), filteredList.subList(offset, (offset+limit <= filteredList.size() ? offset+limit : filteredList.size())));
 		return result;
