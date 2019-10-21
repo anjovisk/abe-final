@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController("StockControllerV1")
-@RequestMapping("/v1/public/products")
+@RequestMapping("/v1/public/shopkeepers/{shopkeeper}/products")
 @Api(tags = {"Stock"})
 public class StockController {
 	@Autowired
@@ -33,16 +34,17 @@ public class StockController {
 	})
 	@RequestMapping(method=RequestMethod.GET)
 	public ResponseEntity<DataContainer<Product>>  getProducts(
+			@ApiParam(required = true, value = "Código do atacadista") @PathVariable("shopkeeper") Long shopkeeper,
 			@ApiParam(required = false, value = "Código dos produtos") @RequestParam(name="ids", required=false) List<Long> ids,
 			@ApiParam(required = false, value = "Nome do produto") @RequestParam(name="name", required=false) String name,
 			@ApiParam(required = false, value = "Quantidade máxima de produtos retornados na requisição", defaultValue = "10") @RequestParam(name="limit", required=false, defaultValue = "10") int limit,
 			@ApiParam(required = false, value = "Quantidade de produtos ignorados na pesquisa", defaultValue = "0") @RequestParam(name="offset", required=false, defaultValue = "0") int offset) {
 		if ((ids != null) && (!ids.isEmpty())) {
-			return ResponseEntity.accepted().body(stockService.find(ids, limit, offset));
+			return ResponseEntity.accepted().body(stockService.find(shopkeeper, ids, limit, offset));
 		} else {
 			Product parameters = new Product();
 			parameters.setName(name);
-			return ResponseEntity.accepted().body(stockService.find(parameters, limit, offset));
+			return ResponseEntity.accepted().body(stockService.find(shopkeeper, parameters, limit, offset));
 		}
 	}
 	
@@ -53,8 +55,9 @@ public class StockController {
 	})
 	@RequestMapping(path="/{id}", method=RequestMethod.GET)
 	public ResponseEntity<Product> getProduct(
+			@ApiParam(required = true, value = "Código do atacadista") @PathVariable("shopkeeper") Long shopkeeper,
 			@ApiParam(required = false, value = "Código do produto") @RequestParam(name="id", required=false) Long id) {
-		Optional<Product> product = stockService.getAvailableProduct(id);
+		Optional<Product> product = stockService.getAvailableProduct(shopkeeper, id);
 		return product.isPresent()
 				? ResponseEntity.accepted().body(product.get())
 						: ResponseEntity.notFound().build();

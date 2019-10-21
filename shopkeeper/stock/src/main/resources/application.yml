@@ -2,4 +2,4 @@ spring:
   application:
     name: stock
 server:
-  port: 8083
+  port: 9091

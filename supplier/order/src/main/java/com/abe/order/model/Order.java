@@ -3,6 +3,7 @@ package com.abe.order.model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel
 public class Order {
 	private static Long ghostId = 0l;
 	
@@ -24,7 +25,6 @@ public class Order {
 	
 	public Order(Long budgetId) {
 		this.id = ++ghostId;
-		this.status = OrderStatus.REQUESTED;
 		this.budgetId = budgetId;
 	}
 	

@@ -1,0 +1,9 @@
+zuul:
+  routes:
+    stock:
+      url: http://localhost:9091
+    notification:
+      url: http://localhost:9092
+server:
+  port:
+    9090

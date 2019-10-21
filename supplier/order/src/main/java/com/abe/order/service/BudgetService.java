@@ -2,9 +2,7 @@ package com.abe.order.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,19 +14,21 @@ import com.abe.order.exception.BudgetRequestException;
 import com.abe.order.exception.SupplierAnswerException;
 import com.abe.order.model.Budget;
 import com.abe.order.model.Budget.BudgetStatus;
+import com.abe.order.model.SupplierNotificationRequest.NotificationType;
 import com.abe.order.model.BudgetRequest;
 import com.abe.order.model.Product;
+import com.abe.order.model.ShopkeeperNotificationRequest;
 import com.abe.order.model.SupplierAnswer;
+import com.abe.order.model.SupplierNotificationRequest;
 
 @Service
-public class BudgetService {
+public class BudgetService extends BudgetServiceBase {
 	@Autowired
 	private ProductService productService;
 	@Autowired
 	private OrderService orderService;
-	
-	private static Map<Long, List<BudgetRequest>> budgetRequests = new HashMap<>();
-	private static Map<Long, List<Budget>> budgets = new HashMap<>();
+	@Autowired
+	private NotificationService notificationService;
 	
 	public void requestBudget(Long supplier, BudgetRequest newBudgetRequest) {
 		Optional<BudgetRequest> pendingBudgetRequest = getBudgetRequest(newBudgetRequest.getClient(), supplier);
@@ -36,7 +36,10 @@ public class BudgetService {
 			throw new BudgetRequestException("Já existe uma solicitação de orçament em andamento.");
 		}
 		budgetRequests.get(supplier).add(newBudgetRequest);
-		//TODO - Notify supplier
+		SupplierNotificationRequest notificationRequest = new SupplierNotificationRequest();
+		notificationRequest.setKey(String.valueOf(newBudgetRequest.getClient()));
+		notificationRequest.setType(NotificationType.BUDGET_REQUESTED);
+		notificationService.notifySupplier(supplier, notificationRequest);
 	}
 	
 	public void createBudget(Long supplier, SupplierAnswer supplierAnswer) {
@@ -56,7 +59,10 @@ public class BudgetService {
 		}
 		budgets.get(supplier).add(budget);
 		System.out.println(String.format("budget id: %s", budget.getId()));
-		//TODO - Notify Retailer
+		ShopkeeperNotificationRequest notificationRequest = new ShopkeeperNotificationRequest();
+		notificationRequest.setKey(String.valueOf(budget.getId()));
+		notificationRequest.setType(com.abe.order.model.ShopkeeperNotificationRequest.NotificationType.BUDGET_CREATED);
+		notificationService.notifyShopkeeper(budget.getClient(), notificationRequest);
 	}
 	
 	private Optional<BudgetRequest> getBudgetRequest(Long client, Long supplier) {
@@ -81,24 +87,16 @@ public class BudgetService {
 		return result;
 	}
 	
-	public Optional<Budget> getBudget(Long supplier, Long id) {
-		if (!budgets.containsKey(supplier)) {
-			budgets.put(supplier, new ArrayList<Budget>());
-		}
-		Optional<Budget> result = budgets.get(supplier).stream().filter(budget ->
-			budget.getId().equals(id)
-			&& budget.getSupplier().equals(supplier)
-		).findFirst();
-		return result;
-	}
-	
 	public void rejectBudget(Long supplier, Long id) {
 		Optional<Budget> budget = getPendingBudget(supplier, id);
 		if (!budget.isPresent()) {
 			throw new BudgetNotFoundException("Orçamento pendente não encontrado.");
 		}
 		budget.get().setStatus(BudgetStatus.REJECTED);
-		//TODO - Notify supplier
+		SupplierNotificationRequest notificationRequest = new SupplierNotificationRequest();
+		notificationRequest.setKey(String.valueOf(budget.get().getId()));
+		notificationRequest.setType(NotificationType.BUDGET_REJECTED);
+		notificationService.notifySupplier(supplier, notificationRequest);
 	}
 	
 	public void acceptBudget(Long supplier, Long id) {
@@ -108,6 +106,9 @@ public class BudgetService {
 		}
 		orderService.create(budget.get());
 		budget.get().setStatus(BudgetStatus.ACCEPTED);
-		//TODO - Notify supplier
+		SupplierNotificationRequest notificationRequest = new SupplierNotificationRequest();
+		notificationRequest.setKey(String.valueOf(budget.get().getId()));
+		notificationRequest.setType(NotificationType.BUDGET_ACCEPTED);
+		notificationService.notifySupplier(supplier, notificationRequest);
 	}
 }

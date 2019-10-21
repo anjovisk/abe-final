@@ -6,15 +6,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.abe.order.exception.OrderNotFoundException;
 import com.abe.order.model.Budget;
 import com.abe.order.model.Order;
+import com.abe.order.model.ShopkeeperNotificationRequest;
 import com.abe.order.model.Order.OrderStatus;
 
 @Service
 public class OrderService {
+	@Autowired
+	private NotificationService notificationService;
+	@Autowired
+	private BudgetServiceBase budgetServiceBase;
 	
 	private static Map<Long, List<Order>> orders = new HashMap<>();
 	
@@ -25,6 +31,7 @@ public class OrderService {
 		}
 		orders.get(budget.getSupplier()).add(order);
 		System.out.println(String.format("Order id: %s", order.getId()));
+		updateStatus(budget.getSupplier(), order.getId(), OrderStatus.REQUESTED);
 		return order;
 	}
 	
@@ -43,7 +50,25 @@ public class OrderService {
 		if (!order.isPresent()) {
 			throw new OrderNotFoundException("Pedido não encontrado");
 		}
+		Optional<Budget> budget = budgetServiceBase.getBudget(supplier, order.get().getBudgetId());
 		order.get().setStatus(orderStatus);
-		//TODO - notify retainer
+		ShopkeeperNotificationRequest notificationRequest = new ShopkeeperNotificationRequest();
+		notificationRequest.setKey(String.valueOf(orderId));
+		notificationRequest.setType(com.abe.order.model.ShopkeeperNotificationRequest.NotificationType.ORDER_STATUS_CHANGED);
+		switch (order.get().getStatus()) {
+			case REQUESTED:
+				notificationRequest.setDescription("Pedido solicitado.");
+				break;
+			case DONE:
+				notificationRequest.setDescription("Processo de fabricação finalizado.");
+				break;
+			case IN_PROGRESS:
+				notificationRequest.setDescription("Pedido em processo de fabricação.");
+				break;
+			case SENT:
+				notificationRequest.setDescription("Pedido despachado.");
+				break;
+		}
+		notificationService.notifyShopkeeper(budget.get().getClient(), notificationRequest);
 	}
 }
