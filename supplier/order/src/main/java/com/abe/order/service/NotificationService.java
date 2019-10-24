@@ -20,9 +20,9 @@ public class NotificationService {
 		restTemplate.postForLocation(notificationUrl, notificationRequest);
 	}
 	
-	public void notifyShopkeeper(Long shopkeeper, ShopkeeperNotificationRequest notificationRequest) {
+	public void notifyShopkeeper(ShopkeeperNotificationRequest notificationRequest, String webhookUrl) {
 		RestTemplate restTemplate = new RestTemplate();
-		String notificationUrl = String.format(env.getProperty("shopkeeper.notification.url"), shopkeeper);
+		String notificationUrl = String.format(webhookUrl);
 		restTemplate.postForLocation(notificationUrl, notificationRequest);
 	}
 }

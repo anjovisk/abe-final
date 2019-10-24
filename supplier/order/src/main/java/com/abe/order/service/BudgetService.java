@@ -62,7 +62,7 @@ public class BudgetService extends BudgetServiceBase {
 		ShopkeeperNotificationRequest notificationRequest = new ShopkeeperNotificationRequest();
 		notificationRequest.setKey(String.valueOf(budget.getId()));
 		notificationRequest.setType(com.abe.order.model.ShopkeeperNotificationRequest.NotificationType.BUDGET_CREATED);
-		notificationService.notifyShopkeeper(budget.getClient(), notificationRequest);
+		notificationService.notifyShopkeeper(notificationRequest, budget.getWebhookUrl());
 	}
 	
 	private Optional<BudgetRequest> getBudgetRequest(Long client, Long supplier) {

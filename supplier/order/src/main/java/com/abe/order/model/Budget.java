@@ -27,6 +27,7 @@ public class Budget {
 		this.status = BudgetStatus.PENDING;
 		this.items = budgetRequest.getItems();
 		this.client = budgetRequest.getClient();
+		this.webhookUrl = budgetRequest.getWebhookUrl();
 		this.supplier = supplier;
 		this.total = total;
 		this.estimatedDeliveryDate = estimatedDeliveryDate;
@@ -48,7 +49,10 @@ public class Budget {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@ApiModelProperty(notes = "Data estimada da entrega yyyy-MM-dd", example = "2019-09-21")
 	private LocalDate estimatedDeliveryDate;
+	@ApiModelProperty
 	private String budgetNumber;
+	@ApiModelProperty
+	private String webhookUrl;
 	
 	public List<BudgetItem> getItems() {
 		return items;
@@ -97,5 +101,11 @@ public class Budget {
 	}
 	public void setBudgetNumber(String budgetNumber) {
 		this.budgetNumber = budgetNumber;
+	}
+	public String getWebhookUrl() {
+		return webhookUrl;
+	}
+	public void setWebhookUrl(String webhookUrl) {
+		this.webhookUrl = webhookUrl;
 	}
 }

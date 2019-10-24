@@ -69,6 +69,6 @@ public class OrderService {
 				notificationRequest.setDescription("Pedido despachado.");
 				break;
 		}
-		notificationService.notifyShopkeeper(budget.get().getClient(), notificationRequest);
+		notificationService.notifyShopkeeper(notificationRequest, budget.get().getWebhookUrl());
 	}
 }

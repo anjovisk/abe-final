@@ -9,6 +9,8 @@ public class BudgetRequest {
 	private List<BudgetItem> items;
 	@ApiModelProperty
 	private Long client;
+	@ApiModelProperty
+	private String webhookUrl;
 	public List<BudgetItem> getItems() {
 		return items;
 	}
@@ -20,5 +22,11 @@ public class BudgetRequest {
 	}
 	public void setClient(Long client) {
 		this.client = client;
+	}
+	public String getWebhookUrl() {
+		return webhookUrl;
+	}
+	public void setWebhookUrl(String webhookUrl) {
+		this.webhookUrl = webhookUrl;
 	}
 }

@@ -2,6 +2,7 @@ package com.abe.stock.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import com.abe.stock.util.DataContainer;
 
 @Service
 public class StockService {
-	private static Map<Long, List<Product>> stock;
+	private static Map<Long, List<Product>> stock = new HashMap<Long, List<Product>>();
 	private static int productsCount = 100;
 	
 	private List<Product> getStock(Long shopkeeper) {
@@ -31,6 +32,7 @@ public class StockService {
 				product.setCount(random.nextInt(10));
 				products.add(product);
 			}
+			stock.put(shopkeeper, products);
 		}
 		return stock.get(shopkeeper);
 	}
