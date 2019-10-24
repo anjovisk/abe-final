@@ -31,3 +31,7 @@ Arquitetura de backend e microsserviços
 - Criar o container do atacadista: acesse "abe-final > supplier" e execute <winpty docker run -d -p 8080:8080 --name supplier {IMAGE_ID}>
 - Criar a imagem docker do lojista: acesse "abe-final > shopkeeper" e execute <docker build -t "shopkeeper:abe-final" .>
 - Cirar o container do lojista: acesse "abe-final > shopkeeper" e execute <winpty docker run -d -p 9090:9090 --name shopkeeper {IMAGE_ID}>
+
+## APIs
+A documentação das APIs foi produzida utilizando o swagger e pode ser acessada através da url http://{endereco:porta}/swagger-ui.html
+![Swagger](https://docs.google.com/drawings/d/e/2PACX-1vSjPEdpH_itR_nwox2rU0PJ7uTkopu8wLlPihYjShB4Hz-ZuwHZ8JIK6vzF-t1SN75531ia_VVcgtBd/pub?w=927&h=495)
