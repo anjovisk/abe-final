@@ -20,6 +20,7 @@ public class Swagger2Config {
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.abe.order.controller.v1"))
 				.build()
+				.pathMapping("/order/")
 				.apiInfo(apiInfo())
 				.tags(
 						new Tag("Orders", "API REST de pedidos"));

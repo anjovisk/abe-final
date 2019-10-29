@@ -1,12 +1,15 @@
 package com.abe.catalog.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+
+import org.springframework.hateoas.Identifiable;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class Product {
+public class Product implements Identifiable<Serializable> {
 	@ApiModelProperty
 	private Long id;
 	@ApiModelProperty

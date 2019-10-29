@@ -1,6 +1,9 @@
 package com.abe.supplier.notification.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import org.springframework.hateoas.Identifiable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -8,7 +11,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class Notification {
+public class Notification  implements Identifiable<Serializable> {
 	private static Long ghostId = 0l;
 	
 	@ApiModel

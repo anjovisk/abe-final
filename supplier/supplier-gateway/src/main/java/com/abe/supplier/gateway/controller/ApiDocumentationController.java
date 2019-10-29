@@ -30,7 +30,6 @@ public class ApiDocumentationController implements SwaggerResourcesProvider {
 		resource.setName(name);
 		resource.setLocation(location);
 		resource.setSwaggerVersion(version);
-
 		return resource;
 	}
 }

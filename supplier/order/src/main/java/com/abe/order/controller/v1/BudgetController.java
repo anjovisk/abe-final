@@ -3,6 +3,8 @@ package com.abe.order.controller.v1;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,8 @@ import com.abe.order.exception.BudgetNotFoundException;
 import com.abe.order.model.Budget;
 import com.abe.order.model.BudgetRequest;
 import com.abe.order.model.SupplierAnswer;
+import com.abe.order.model.resource.BudgetResource;
+import com.abe.order.model.resource.mapper.ResourceMapper;
 import com.abe.order.service.BudgetService;
 
 import io.swagger.annotations.Api;
@@ -23,9 +27,12 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController("BudgetControllerV1")
+@ExposesResourceFor(Budget.class)
 @RequestMapping("/v1/public/suppliers/{supplier}/budgets")
 @Api(tags = {"Budgets"})
 public class BudgetController {
+	@Autowired
+	private ResourceMapper resourceMapper;
 	@Autowired
 	private BudgetService budgetService;
 	
@@ -59,12 +66,17 @@ public class BudgetController {
 			@ApiResponse(code = 404, message = "Orçamento não encontrado.")
 	})
 	@RequestMapping(path = "{id}", method=RequestMethod.GET)
-	public ResponseEntity<Budget> getBudget(
+	public ResponseEntity<BudgetResource> getBudget(
 			@ApiParam(required = true, value = "Código do fornecedor") @PathVariable("supplier") Long supplier, 
 			@ApiParam(required = true, value = "Código do orçamento") @PathVariable("id") Long id) {
 		Optional<Budget> budget = budgetService.getBudget(supplier, id);
+		BudgetResource budgetResource = null;
+		if (budget.isPresent()) {
+			budgetResource = resourceMapper.toResource(budget.get(), BudgetResource.class);
+			budgetResource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(BudgetController.class).getBudget(supplier, id)).withSelfRel());
+		}
 		return budget.isPresent() 
-				? ResponseEntity.accepted().body(budget.get())
+				? ResponseEntity.accepted().body(budgetResource)
 						: ResponseEntity.notFound().build();
 	}
 	

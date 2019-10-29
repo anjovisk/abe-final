@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Tag;
@@ -19,7 +20,9 @@ public class Swagger2Config {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.abe.catalog.controller.v1"))
+				.paths(PathSelectors.any())
 				.build()
+				.pathMapping("/catalog/")
 				.apiInfo(apiInfo())
 				.tags(
 						new Tag("Catalog", "API REST do catálogo de produtos."));

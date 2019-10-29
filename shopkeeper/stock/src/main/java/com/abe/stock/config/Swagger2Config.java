@@ -20,6 +20,7 @@ public class Swagger2Config {
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.abe.stock.controller.v1"))
 				.build()
+				.pathMapping("/stock/")
 				.apiInfo(apiInfo())
 				.tags(
 						new Tag("Stock", "API REST para gerenciamento do estoque do lojista"));

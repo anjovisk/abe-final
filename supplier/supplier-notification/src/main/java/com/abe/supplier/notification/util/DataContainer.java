@@ -1,11 +1,11 @@
 package com.abe.supplier.notification.util;
 
-import java.util.List;
+import java.util.Collection;
 
 public class DataContainer<T> {
 	public DataContainer() {}
 	
-	public DataContainer(int limit, int offset, int total, List<T> data) {
+	public DataContainer(int limit, int offset, int total, Collection<T> data) {
 		this.limit = limit;
 		this.offset = offset;
 		this.total = total;
@@ -36,10 +36,10 @@ public class DataContainer<T> {
 	public void setCount(int count) {
 		this.count = count;
 	}
-	public List<T> getData() {
+	public Collection<T> getData() {
 		return data;
 	}
-	public void setData(List<T> data) {
+	public void setData(Collection<T> data) {
 		this.data = data;
 	}
 	
@@ -47,5 +47,5 @@ public class DataContainer<T> {
 	private int offset;
 	private int total;
 	private int count;
-	private List<T> data;
+	private Collection<T> data;
 }

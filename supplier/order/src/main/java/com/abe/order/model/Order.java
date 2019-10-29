@@ -1,10 +1,14 @@
 package com.abe.order.model;
 
+import java.io.Serializable;
+
+import org.springframework.hateoas.Identifiable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class Order {
+public class Order implements Identifiable<Serializable> {
 	private static Long ghostId = 0l;
 	
 	@ApiModel

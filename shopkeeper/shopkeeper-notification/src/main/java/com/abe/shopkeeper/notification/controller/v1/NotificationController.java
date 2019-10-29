@@ -3,6 +3,8 @@ package com.abe.shopkeeper.notification.controller.v1;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.abe.shopkeeper.notification.model.Notification;
 import com.abe.shopkeeper.notification.model.NotificationRequest;
+import com.abe.shopkeeper.notification.model.resource.NotificationResource;
+import com.abe.shopkeeper.notification.model.resource.mapper.ResourceMapper;
 import com.abe.shopkeeper.notification.service.NotificationService;
 import com.abe.shopkeeper.notification.util.DataContainer;
 
@@ -23,22 +27,30 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController("NotificationControllerV1")
+@ExposesResourceFor(Notification.class)
 @RequestMapping("/v1/public/shopkeepers/{shopkeeper}/notifications")
 @Api(tags = {"Notifications"})
 public class NotificationController {
 	@Autowired
 	private NotificationService notificationService;
+	@Autowired
+	private ResourceMapper resourceMapper;
 	
 	@ApiOperation(value = "Lista as notificações de um atacadista")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Solicitação procecessada com sucesso.")
 	})
 	@RequestMapping(method=RequestMethod.GET)
-	public ResponseEntity<DataContainer<Notification>>  getNotifications(
+	public ResponseEntity<DataContainer<NotificationResource>>  getNotifications(
 			@ApiParam(required = true, value = "Código do atacadista") @PathVariable("shopkeeper") Long shopkeeper,
 			@ApiParam(required = false, value = "Quantidade máxima de notificações retornadas na requisição", defaultValue = "10") @RequestParam(name="limit", required=false, defaultValue = "10") int limit,
 			@ApiParam(required = false, value = "Quantidade de notificações ignoradas na pesquisa", defaultValue = "0") @RequestParam(name="offset", required=false, defaultValue = "0") int offset) {
-		return ResponseEntity.accepted().body(notificationService.find(shopkeeper, limit, offset));
+		DataContainer<Notification> notifications = notificationService.find(shopkeeper, limit, offset);
+		DataContainer<NotificationResource> result = new DataContainer<>(limit, offset, notifications.getTotal(), resourceMapper.toResourceCollection(notifications.getData(), NotificationResource.class));
+		result.getData().forEach(notificationResource ->{
+			notificationResource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(NotificationController.class).getNotification(shopkeeper, notificationResource.getNotificationId())).withSelfRel());
+		});
+		return ResponseEntity.accepted().body(result);
 	}
 	
 	@ApiOperation(value = "Obtém uma notificação")
@@ -47,12 +59,17 @@ public class NotificationController {
 			@ApiResponse(code = 404, message = "Notificação não encontrada.")
 	})
 	@RequestMapping(path = "{id}", method=RequestMethod.GET)
-	public ResponseEntity<Notification> getBudget(
+	public ResponseEntity<NotificationResource> getNotification(
 			@ApiParam(required = true, value = "Código do atacadista") @PathVariable("shopkeeper") Long shopkeeper, 
 			@ApiParam(required = true, value = "Código da notificação") @PathVariable("id") Long id) {
 		Optional<Notification> notification = notificationService.getNotification(shopkeeper, id);
+		NotificationResource notificationResource = null;
+		if (notification.isPresent()) {
+			notificationResource = resourceMapper.toResource(notification.get(), NotificationResource.class);
+			notificationResource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(NotificationController.class).getNotification(shopkeeper, notificationResource.getNotificationId())).withSelfRel());
+		}
 		return notification.isPresent() 
-				? ResponseEntity.accepted().body(notification.get())
+				? ResponseEntity.accepted().body(notificationResource)
 						: ResponseEntity.notFound().build();
 	}
 	
@@ -61,7 +78,7 @@ public class NotificationController {
 			@ApiResponse(code = 201, message = "Notificação criada com sucesso.")
 	})
 	@RequestMapping(method=RequestMethod.POST)
-	public ResponseEntity<Notification> requestBudget(
+	public ResponseEntity<Notification> create(
 			@ApiParam(required = true, value = "Código do atacadista") @PathVariable("shopkeeper") Long shopkeeper, 
 			@ApiParam(required = true, value = "Notificação") @RequestBody(required = true) NotificationRequest notificationRequest) {
 		Notification notification = notificationService.create(shopkeeper, notificationRequest);

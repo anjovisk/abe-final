@@ -2,4 +2,7 @@ spring:
   application:
     name: stock
 server:
-  port: 9091
+  port:
+    9091
+  use-forward-headers:
+    true

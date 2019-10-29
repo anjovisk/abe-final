@@ -1,15 +1,18 @@
 package com.abe.order.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.hateoas.Identifiable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-public class Budget {
+public class Budget implements Identifiable<Serializable> {
 	private static Long ghostId = 0l;
 	
 	@ApiModel

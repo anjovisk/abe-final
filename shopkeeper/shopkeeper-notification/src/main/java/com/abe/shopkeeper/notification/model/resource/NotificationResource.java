@@ -1,39 +1,15 @@
-package com.abe.shopkeeper.notification.model;
+package com.abe.shopkeeper.notification.model.resource;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import org.springframework.hateoas.Identifiable;
-
+import com.abe.shopkeeper.notification.model.Notification;
+import com.abe.shopkeeper.notification.model.Notification.NotificationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel
-public class Notification implements Identifiable<Serializable> {
-	private static Long ghostId = 0l;
-	
-	@ApiModel
-	public enum NotificationType {
-		@ApiModelProperty(notes = "Orçamento criado")
-		BUDGET_CREATED,
-		@ApiModelProperty(notes = "Status da entrega alterado")
-		ORDER_STATUS_CHANGED
-	}
-	
-	public Notification() {
-		
-	}
-	
-	public Notification(NotificationRequest notificationRequest) {
-		this.id = ++ghostId;
-		this.type = notificationRequest.getType();
-		this.key = notificationRequest.getKey();
-		this.description = notificationRequest.getDescription();
-		this.date = LocalDateTime.now();
-	}
-	
+public class NotificationResource extends ResourceBase<Notification, NotificationResource> {
 	@ApiModelProperty
 	private Long id;
 	@ApiModelProperty
@@ -46,7 +22,18 @@ public class Notification implements Identifiable<Serializable> {
 	@ApiModelProperty
 	private String description;
 	
-	public Long getId() {
+	@Override
+	public NotificationResource prepare(Notification modelItem) {
+		this.id = modelItem.getId();
+		this.type = modelItem.getType();
+		this.key = modelItem.getKey();
+		this.date = modelItem.getDate();
+		this.description = modelItem.getDescription();
+		return this;
+	}
+
+	@JsonProperty("id")
+	public Long getNotificationId() {
 		return id;
 	}
 
@@ -85,4 +72,5 @@ public class Notification implements Identifiable<Serializable> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 }

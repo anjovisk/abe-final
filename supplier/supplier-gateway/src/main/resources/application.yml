@@ -1,11 +1,11 @@
 zuul:
   routes:
     order:
-      url: http://localhost:8081
+      url: http://localhost:8081/
     notification:
-      url: http://localhost:8082
+      url: http://localhost:8082/
     catalog:
-      url: http://localhost:8083
+      url: http://localhost:8083/
 server:
   port:
     8080

@@ -1,6 +1,7 @@
 package com.abe.supplier.notification.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.abe.supplier.notification.model.Notification;
 import com.abe.supplier.notification.model.NotificationRequest;
-import com.abe.supplier.notification.util.DataContainer;
 
 @Service
 public class NotificationService {
@@ -26,13 +26,12 @@ public class NotificationService {
 		return notification;
 	}
 	
-	public DataContainer<Notification> find(Long supplier, int limit, int offset) {
+	public Collection<Notification> find(Long supplier, int limit, int offset) {
 		if (!notifications.containsKey(supplier)) {
 			notifications.put(supplier, new ArrayList<Notification>());
 		}
 		List<Notification> filteredList = notifications.get(supplier);
-		DataContainer<Notification> result = new DataContainer<Notification>(limit, offset, filteredList.size(), filteredList.subList(offset, (offset+limit <= filteredList.size() ? offset+limit : filteredList.size())));
-		return result;
+		return filteredList.subList(offset, (offset+limit <= filteredList.size() ? offset+limit : filteredList.size()));
 	}
 	
 	public Optional<Notification> getNotification(Long supplier, Long notificationId) {

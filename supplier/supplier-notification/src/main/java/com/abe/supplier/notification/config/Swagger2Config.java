@@ -20,6 +20,7 @@ public class Swagger2Config {
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.abe.supplier.notification.controller.v1"))
 				.build()
+				.pathMapping("/notification/")
 				.apiInfo(apiInfo())
 				.tags(
 						new Tag("Notifications", "API REST de notifiações"));

@@ -2,4 +2,7 @@ spring:
   application:
     name: notification
 server:
-  port: 9092
+  port: 
+    9092
+  use-forward-headers:
+    true
