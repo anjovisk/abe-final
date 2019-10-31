@@ -26,4 +26,14 @@ public class BudgetServiceBase {
 		).findFirst();
 		return result;
 	}
+	
+	public Optional<BudgetRequest> getBudgetRequest(Long client, Long supplier) {
+		if (!budgetRequests.containsKey(supplier)) {
+			budgetRequests.put(supplier, new ArrayList<BudgetRequest>());
+		}
+		Optional<BudgetRequest> result = budgetRequests.get(supplier).stream().filter(request ->
+			request.getClient().equals(client)
+		).findFirst();
+		return result;
+	}
 }

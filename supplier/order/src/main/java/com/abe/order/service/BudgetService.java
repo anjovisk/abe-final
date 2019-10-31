@@ -58,21 +58,12 @@ public class BudgetService extends BudgetServiceBase {
 			budgets.put(supplier, new ArrayList<Budget>());
 		}
 		budgets.get(supplier).add(budget);
+		budgetRequests.get(supplier).removeIf(budgetRequest -> budgetRequest.getClient().equals(pendingBudgetRequest.get().getClient()));
 		System.out.println(String.format("budget id: %s", budget.getId()));
 		ShopkeeperNotificationRequest notificationRequest = new ShopkeeperNotificationRequest();
 		notificationRequest.setKey(String.valueOf(budget.getId()));
 		notificationRequest.setType(com.abe.order.model.ShopkeeperNotificationRequest.NotificationType.BUDGET_CREATED);
 		notificationService.notifyShopkeeper(notificationRequest, budget.getWebhookUrl());
-	}
-	
-	private Optional<BudgetRequest> getBudgetRequest(Long client, Long supplier) {
-		if (!budgetRequests.containsKey(supplier)) {
-			budgetRequests.put(supplier, new ArrayList<BudgetRequest>());
-		}
-		Optional<BudgetRequest> result = budgetRequests.get(supplier).stream().filter(request ->
-			request.getClient().equals(client)
-		).findFirst();
-		return result;
 	}
 	
 	public Optional<Budget> getPendingBudget(Long supplier, Long id) {
